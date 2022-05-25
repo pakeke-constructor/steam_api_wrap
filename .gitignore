@@ -10,4 +10,7 @@ Makefile
 
 *.exe
 
+*.dll
+*.a
+*.lib
 

@@ -41,7 +41,7 @@ def make_pass_params(new_params):
 def make_header_params(new_params):
     buf = []
     for p in new_params:
-        buf.append(p["type"] + p["name"])
+        buf.append(p["type"] + " " + p["name"])
     return "( " + ", ".join(buf) +  " )"
 
 
@@ -52,10 +52,15 @@ def make_function_body(func):
     return ret_val
 
 
+INLINE_NO_STEAM_API = True
 
 def make_function_header(func):
     new_params = get_new_params(func)
-    return func["rtnType"] + " " + func["name"] + make_header_params(new_params)
+    if INLINE_NO_STEAM_API:
+        return "inline " + func["rtnType"].replace("S_API","") + " C" + func["name"] + make_header_params(new_params)
+    else:
+        return func["rtnType"] + " C" + func["name"] + make_header_params(new_params)
+
 
 
 
@@ -91,8 +96,9 @@ for func in header.functions:
     for param in func.get("parameters"):
         if "&" in param.get("type"):
             num_conversions += 1
-            new_header += ("\n" + make_function_header(func))
+            new_header += ("\n" + make_function_header(func)) + ";"
             new_source += ("\n" + make_function(func))
+            break
 
 new_header += end_header
 
